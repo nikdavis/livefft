@@ -69,7 +69,7 @@ plt.ylabel("Magnitude (dB)")
 ax.set_ylim(-50, 90)
 ax.set_xlim(0, 3500)
 line, = ax.plot([], [])
-x = [float(x) / N * Fs for x in range(0, N/2) ]
+x = [float(x) / N / 2 * Fs for x in range(0, N/2) ]
 #start 
 
 def update(X):
