@@ -69,7 +69,7 @@ plt.ylabel("Magnitude (dB)")
 ax.set_ylim(-50, 90)
 ax.set_xlim(0, 3500)
 line, = ax.plot([], [])
-x = [float(x) / N / 2 * Fs for x in range(0, N/2) ]
+x = [float(x) / N * Fs for x in range(0, N/2) ]
 #start 
 
 def update(X):
@@ -77,22 +77,26 @@ def update(X):
 	return line,
 
 def data_gen():
-	try:
-		# could also use array('h', ..)
-		micData = rawToShort(stream.read(N), 2, 0)		
-		signal = [float(i) for i in micData]
-		X = [ i / N for i in fft(signal, N)[0:N/2] ]
-		X = [10 * log10 (abs(y) ** 2) for y in X]
-	except IOError:
-		X = [ 0 for x in range(N/2) ]
-		print "Overflow"
-	yield X
+		try:
+			# could also use array('h', ..)
+			micData = rawToShort(stream.read(N), 2, 0)		
+			signal = [float(i) for i in micData]
+			X_fft = [ i / N for i in fft(signal, N)[0:N/2] ]
+			try:
+				X = [10 * log10 (abs(y) ** 2) for y in X_fft]
+			except ValueError:
+				print X_fft
+				print X
+		except IOError:
+			X = [ 0 for x in range(N/2) ]
+			print "Overflow"
+		yield X
 
 def init():
     line.set_data([], [])
     return line,
 
-ani = animation.FuncAnimation(fig, update, data_gen, init, interval=1, blit=True)
+ani = animation.FuncAnimation(fig, update, data_gen, init, interval=10, blit=True)
 plt.show()
 
 stream.stop_stream()
