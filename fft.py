@@ -77,13 +77,16 @@ def update(X):
 	return line,
 
 def data_gen():
-	while True:
 		try:
 			# could also use array('h', ..)
 			micData = rawToShort(stream.read(N), 2, 0)		
 			signal = [float(i) for i in micData]
-			X = [ i / N for i in fft(signal, N)[0:N/2] ]
-			X = [10 * log10 (abs(y) ** 2) for y in X]
+			X_fft = [ i / N for i in fft(signal, N)[0:N/2] ]
+			try:
+				X = [10 * log10 (abs(y) ** 2) for y in X_fft]
+			except ValueError:
+				print X_fft
+				print X
 		except IOError:
 			X = [ 0 for x in range(N/2) ]
 			print "Overflow"
@@ -93,7 +96,7 @@ def init():
     line.set_data([], [])
     return line,
 
-ani = animation.FuncAnimation(fig, update, data_gen, init, interval=10, blit=True)
+ani = animation.FuncAnimation(fig, update, data_gen, init, interval=1, blit=True)
 plt.show()
 
 stream.stop_stream()
