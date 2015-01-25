@@ -9,6 +9,8 @@ from matplotlib import animation
 import pyaudio
 import struct
 
+GRAPH_UPPER_FREQ = 3500
+
 #based on wikipedia's FFT psuedocode, expects floats
 def fft(x, N):
   fft.count += 1
@@ -67,7 +69,7 @@ fig, ax = plt.subplots()
 plt.xlabel("Frequency (Hz)")
 plt.ylabel("Magnitude (dB)")
 ax.set_ylim(-50, 90)
-ax.set_xlim(0, 3500)
+ax.set_xlim(0, GRAPH_UPPER_FREQ)
 line, = ax.plot([], [])
 x = [float(x) / N * Fs for x in range(0, N/2) ]
 #start 
@@ -86,7 +88,6 @@ def data_gen():
       X = [10 * log10 (abs(y) ** 2) for y in X_fft]
     except ValueError:
       print X_fft
-      print X
   except IOError:
     X = [ 0 for x in range(N/2) ]
     print "Overflow"
